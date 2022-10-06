@@ -1,0 +1,26 @@
+version: '3.9'
+
+
+services: 
+  redis:
+    image: 'bitnami/redis:latest'
+    command: redis-server --requirepass currentPassword
+    ports:
+      - 6379:6379
+    volumes:
+      - $PWD/redis-data:/var/lib/redis
+      - $PWD/redis.conf:/usr/local/etc/redis/redis.conf
+    
+    environment:
+      - REDIS_REPLICATION_MODEL=master
+      - ALLOW_EMPTY_PASSWORD=yes
+    
+  app:
+    build: .
+    command: go run main.go
+    volumes:
+      - .:/app
+    ports:
+      - 8080:8080
+    depends_on:
+      - redis
