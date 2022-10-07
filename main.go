@@ -1,53 +1,17 @@
 package main
 
 import (
-	"fmt"
+	"html/template"
 	"log"
 	"net/http"
 	"runtime"
+
+	"github.com/javokhirbek1999/tez-spider/handlers"
 )
 
-// var wg sync.WaitGroup
-
-// var threadProfile = pprof.Lookup("threadcreate")
-
-// var mu sync.Mutex
-
-// func wiki2(c *colly.Collector, workerID int, workers []int) {
-
-// 	runtime.LockOSThread()
-// 	// mu.Lock()
-// 	defer wg.Done()
-// 	c.OnHTML(".mw-parser-output", func(e *colly.HTMLElement) {
-// 		e.ChildAttrs("a", "href")
-// 		// for _, link := range links {
-// 		// fmt.Println(link)
-// 		// }
-// 	})
-
-// 	workers[0]++
-
-// 	// mu.Unlock()
-
-// 	runtime.UnlockOSThread()
-
-// 	// done <- ""
-// }
-
-// func wiki(c *colly.Collector, done chan string, workerID int, workers []int) {
-
-// 	c.OnHTML(".mw-parser-output", func(e *colly.HTMLElement) {
-// 		e.ChildAttrs("a", "href")
-// 		// fmt.Println(links)
-// 		// print()
-// 		// for _, link := range links {
-// 		// fmt.Println(link)
-// 		// }
-// 	})
-
-// 	workers[0]++
-
-// }
+type Context struct {
+	Songs []handlers.Song
+}
 
 func init() {
 
@@ -57,34 +21,31 @@ func init() {
 
 func main() {
 
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, "Hello")
+	fs := http.FileServer(http.Dir("./static"))
+
+	http.Handle("/", fs)
+	// http.Handle("/static/*", http.StripPrefix("/static/", fs))
+	http.HandleFunc("/search", func(w http.ResponseWriter, r *http.Request) {
+		templ, err := template.ParseFiles("./client/index.html")
+
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		// query := r.Form.Get("search")
+
+		songs := handlers.Crawler("enrique iglesias")
+
+		// fmt.Fprintf(w, fmt.Sprintf("%v", songs))
+
+		templ.Execute(w, Context{Songs: songs})
+		// err := templ.Execute(w, songs)
+
+		// if err != nil {
+		// log.Fatal(err)
+		// }
 	})
 
-	if err := http.ListenAndServe(":8080", nil); err != nil {
-		log.Fatal(err)
-	}
-
-	// c := colly.NewCollector(
-	// colly.AllowedDomains("en.wikipedia.org"),
-	// )
-	// done := make(chan string)
-
-	// start := time.Now()
-
-	// workers := []int{0}
-
-	// wg.Add(30000)
-	// for i := 0; i < ; i++ {
-	// wg.Add(1)
-	// go wiki(c, done, i, workers)
-	// go wiki2(c, i, workers)
-	// }
-
-	// c.Visit("https://en.wikipedia.org/wiki/Web_scraping")
-	// <-done
-	// wg.Wait()
-
-	// fmt.Printf("%d workers are done in %v", workers[0], time.Since(start))
+	http.ListenAndServe(":9090", nil)
 
 }
