@@ -1,51 +1,68 @@
 package main
 
 import (
-	"html/template"
+	"encoding/json"
 	"log"
 	"net/http"
+	"os"
+	"os/signal"
 	"runtime"
 
 	"github.com/javokhirbek1999/tez-spider/handlers"
 )
 
-type Context struct {
-	Songs []handlers.Song
+func init() {
+	runtime.GOMAXPROCS(runtime.NumCPU())
 }
 
-func init() {
-
-	runtime.GOMAXPROCS(runtime.NumCPU())
-
+type Response struct {
+	Data       []handlers.Song
+	Total      int64
+	StatusCode int
 }
 
 func main() {
 
-	fs := http.FileServer(http.Dir("./static"))
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 
-	http.Handle("/", fs)
-	// http.Handle("/static/*", http.StripPrefix("/static/", fs))
-	http.HandleFunc("/search", func(w http.ResponseWriter, r *http.Request) {
-		templ, err := template.ParseFiles("./client/index.html")
+		query := r.URL.Query().Get("query")
 
-		if err != nil {
-			log.Fatal(err)
+		songs := handlers.Crawler(query)
+		encoder := json.NewEncoder(w)
+
+		totalSongs := len(songs)
+
+		if totalSongs == 0 {
+			encoder.Encode(Response{
+				Data:       nil,
+				Total:      0,
+				StatusCode: http.StatusBadRequest,
+			})
+		} else {
+			encoder.Encode(Response{
+				Data:       songs,
+				Total:      int64(totalSongs),
+				StatusCode: http.StatusOK,
+			})
 		}
-
-		// query := r.Form.Get("search")
-
-		songs := handlers.Crawler("enrique iglesias")
-
-		// fmt.Fprintf(w, fmt.Sprintf("%v", songs))
-
-		templ.Execute(w, Context{Songs: songs})
-		// err := templ.Execute(w, songs)
-
-		// if err != nil {
-		// log.Fatal(err)
-		// }
 	})
 
-	http.ListenAndServe(":9090", nil)
+	go func() {
+		err := http.ListenAndServe(":9090", nil)
+
+		if err != nil {
+			log.Fatalf("Server Error: %v", err)
+			return
+		}
+	}()
+
+	sig := make(chan os.Signal)
+
+	signal.Notify(sig, os.Interrupt)
+	signal.Notify(sig, os.Kill)
+
+	signalMessage := <-sig
+
+	log.Fatalf("Server stopped: %v\n", signalMessage)
 
 }
