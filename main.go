@@ -11,19 +11,25 @@ import (
 	"github.com/javokhirbek1999/tez-spider/handlers"
 )
 
-func init() {
-	runtime.GOMAXPROCS(runtime.NumCPU())
-}
-
 type Response struct {
 	Data       []handlers.Song
 	Total      int64
 	StatusCode int
 }
 
+func init() {
+	runtime.GOMAXPROCS(runtime.NumCPU())
+}
+
+func enableCORS(w *http.ResponseWriter) {
+	(*w).Header().Set("Access-Control-Allow-Origin", "*")
+}
+
 func main() {
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+
+		enableCORS(&w)
 
 		query := r.URL.Query().Get("query")
 
