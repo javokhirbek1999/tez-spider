@@ -2,7 +2,6 @@ Tez Spider Client
 ============
 <!-- [![GitHub Stars](https://img.shields.io/github/stars/IgorAntun/node-chat.svg)](https://github.com/IgorAntun/node-chat/stargazers) [![GitHub Issues](https://img.shields.io/github/issues/IgorAntun/node-chat.svg)](https://github.com/IgorAntun/node-chat/issues) [![Current Version](https://img.shields.io/badge/version-1.0.7-green.svg)](https://github.com/IgorAntun/node-chat) [![Live Demo](https://img.shields.io/badge/demo-online-green.svg)](https://igorantun.com/chat) [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/IgorAntun/node-chat?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge) -->
 
-<<<<<<< HEAD
 <a href="http://kiska-url.herokuapp.com/" target="_blank">Tez Spider</a> is a distributed music crawler that crawls 5 different music websites in parallel. <br/>
 This is the server-side app running on golang's net/http package server.
 
@@ -94,14 +93,3 @@ You will then be able to access it at `localhost:9090`
 >You can check out the full license [here](https://github.com/javokhirbek1999/kiska-url-server-side/blob/main/LICENSE)
 
 This project is licensed under the terms of the **MIT** license.
-=======
-## Distributed music scaper backend
-
-
-<ul>
-<li>Distributed</li>
-<li>Paralellism</li>
-<li>Concurrency</li>
-<li>Strong consistency</li>
-</ul>
->>>>>>> d9353151e5788e4b6fb3f76e18a9db323f4b3152
