@@ -2,9 +2,12 @@ package handlers
 
 import (
 	"fmt"
+	"net"
+	"net/http"
 	"runtime"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/gocolly/colly"
 )
@@ -19,7 +22,22 @@ var wg sync.WaitGroup
 var mu sync.Mutex
 
 func getTune(query string, allSongs *[]Song, wg *sync.WaitGroup) {
-	c := colly.NewCollector()
+
+	c := colly.NewCollector(
+		colly.AllowedDomains("https://get-tune.cc", "get-tune.cc"),
+	)
+
+	c.WithTransport(&http.Transport{
+		Proxy: http.ProxyFromEnvironment,
+		DialContext: (&net.Dialer{
+			Timeout:   30 * time.Second,
+			KeepAlive: 30 * time.Second,
+			DualStack: true,
+		}).DialContext,
+		IdleConnTimeout:       120 * time.Second,
+		TLSHandshakeTimeout:   20 * time.Second,
+		ExpectContinueTimeout: 1 * time.Second,
+	})
 
 	// Lock the thread to prevent from being reused
 	runtime.LockOSThread()
@@ -53,8 +71,11 @@ func getTune(query string, allSongs *[]Song, wg *sync.WaitGroup) {
 		}
 
 	})
-	c.Visit(fmt.Sprintf("https://get-tune.cc/search/f/%s/", strings.Join(strings.Split(query, " "), "+")))
+	err := c.Visit(fmt.Sprintf("https://get-tune.cc/search/f/%s/", strings.Join(strings.Split(query, " "), "+")))
 
+	if err != nil {
+		fmt.Printf("Error: %v", err)
+	}
 }
 
 func Crawler(query string) []Song {
