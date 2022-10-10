@@ -9,6 +9,8 @@ import (
 	"os/signal"
 	"runtime"
 
+	gotdotenv "github.com/joho/godotenv"
+
 	"github.com/javokhirbek1999/tez-spider/handlers"
 )
 
@@ -27,6 +29,16 @@ func enableCORS(w *http.ResponseWriter) {
 }
 
 func main() {
+
+	if err := gotdotenv.Load(".env"); err != nil {
+		log.Fatalln("Couldn't load environment variables")
+		return
+	}
+	port := os.Getenv("PORT")
+
+	if port == "" {
+		port = "4000"
+	}
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "Welcome")
@@ -59,7 +71,8 @@ func main() {
 	})
 
 	go func() {
-		err := http.ListenAndServe(":9090", nil)
+
+		err := http.ListenAndServe(":"+port, nil)
 
 		if err != nil {
 			log.Fatalf("Server Error: %v", err)

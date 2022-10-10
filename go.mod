@@ -2,7 +2,10 @@ module github.com/javokhirbek1999/tez-spider
 
 go 1.19
 
-require github.com/gocolly/colly v1.2.0
+require (
+	github.com/gocolly/colly v1.2.0
+	github.com/joho/godotenv v1.4.0
+)
 
 require (
 	github.com/PuerkitoBio/goquery v1.8.0 // indirect
