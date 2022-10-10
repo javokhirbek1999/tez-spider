@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -28,6 +29,10 @@ func enableCORS(w *http.ResponseWriter) {
 func main() {
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, "Welcome")
+	})
+
+	http.HandleFunc("/search", func(w http.ResponseWriter, r *http.Request) {
 
 		enableCORS(&w)
 
