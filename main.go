@@ -41,6 +41,7 @@ func main() {
 	}
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		enableCORS(&w)
 		fmt.Fprintf(w, "Welcome")
 	})
 
